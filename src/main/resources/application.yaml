@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: BookingApp
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/booking_db?createDatabaseIfNotExist=true
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  security:
+    user:
+      name: admin
+      password: admin
+      
+server:
+  port: 80
+
+jwt:
+  secret: 9f2c7e1a6b4d8a0f3c9e2b7d1a5f8c4e9b6a0d3f7e2c5a8b1d4f6e9c2a5
+  expiration: 86400000
