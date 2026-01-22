@@ -11,12 +11,28 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
 
   security:
     user:
       name: admin
       password: admin
-      
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: b.c.shivu019@gmail.com
+    password: cnmt ukpc yrbv hudo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
 server:
   port: 80
 

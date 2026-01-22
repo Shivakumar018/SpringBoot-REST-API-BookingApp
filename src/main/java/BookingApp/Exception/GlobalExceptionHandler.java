@@ -13,4 +13,9 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Object> handle(DataNotFoundException exception) {
 		return ResponseEntity.status(404).body(new ErrorDto(exception.getMessage()));
 	}
+
+	@ExceptionHandler(DataExitsException.class)
+	public ResponseEntity<Object> handle(DataExitsException exception) {
+		return ResponseEntity.status(404).body(new ErrorDto(exception.getMessage()));
+	}
 }
