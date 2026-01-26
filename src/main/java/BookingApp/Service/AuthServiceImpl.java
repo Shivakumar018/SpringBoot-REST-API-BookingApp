@@ -30,27 +30,43 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<ResponseDto> register(RegisterRequestDto request) {
 
-         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+    if (userRepository.findByEmail(request.getEmail()).isPresent()) {
         throw new DataExitsException("Email already registered");
     }
-        String otp = OtpUtil.generateOtp();
 
-        OtpUserCacheDto cache = new OtpUserCacheDto();
-        cache.setName(request.getName());
-        cache.setEmail(request.getEmail());
-        cache.setPassword(passwordEncoder.encode(request.getPassword()));
-        cache.setRole(request.getRole());
-        cache.setOtp(otp);
-
-        redisTemplate.opsForValue()
-                .set(request.getEmail(), cache, 5, TimeUnit.MINUTES);
-
-        sendOtpMail(request.getEmail(), otp);
-
-        return ResponseEntity.ok(
-                new ResponseDto("OTP sent to email", cache.getName())
-        );
+    String role = request.getRole();
+    if (role == null) {
+        throw new RuntimeException("Role is required");
     }
+
+    role = role.toUpperCase();
+    if (!role.startsWith("ROLE_")) {
+        role = "ROLE_" + role;
+    }
+
+    if (!role.equals("ROLE_ADMIN") && !role.equals("ROLE_USER")) {
+        throw new RuntimeException("Invalid role");
+    }
+
+    String otp = OtpUtil.generateOtp();
+
+    OtpUserCacheDto cache = new OtpUserCacheDto();
+    cache.setName(request.getName());
+    cache.setEmail(request.getEmail());
+    cache.setPassword(passwordEncoder.encode(request.getPassword()));
+    cache.setRole(role);
+    cache.setOtp(otp);
+
+    redisTemplate.opsForValue()
+            .set(request.getEmail(), cache, 5, TimeUnit.MINUTES);
+
+    sendOtpMail(request.getEmail(), otp);
+
+    return ResponseEntity.ok(
+            new ResponseDto("OTP sent to email", cache.getName())
+    );
+}
+
 
     @Override
     public ResponseEntity<ResponseDto> login(LoginRequestDto request) {
@@ -93,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
         redisTemplate.delete(request.getEmail());
 
         return ResponseEntity.ok(
-                new ResponseDto("Email verified successfully", user.getName())
+                new ResponseDto("Email verified successfully", user)
         );
     }
 
